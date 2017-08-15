@@ -2,6 +2,8 @@ package main
 
 import "fmt"
 import "golang.org/x/tour/tree"
+import "strings"
+import "strconv"
 
 type Point struct {
 	x int
@@ -53,7 +55,7 @@ func maxRight(root *tree.Tree) (ret int) {
 	return
 }
 
-var points = make(map[Point]rune)
+var points = make(map[Point]string)
 
 func fmtTree(root *tree.Tree) string {
 	printHelper(Point{0, 0}, root)
@@ -65,20 +67,19 @@ func fmtTree(root *tree.Tree) string {
 		xMin = min(xMin, p.x)
 		xMax = max(xMax, p.x)
 	}
-	rect := make([][]rune, yMax+1)
+	rect := make([][]string, yMax+1)
 	for s := range rect {
-		rect[s] = make([]rune, xMax-xMin+1)
+		rect[s] = make([]string, xMax-xMin+1)
 		for i := range rect[s] {
-			rect[s][i] = ' '
+			rect[s][i] = " "
 		}
 	}
 	for p, v := range points {
-		fmt.Println("Inserting point", p, "with value", v)
 		rect[p.y][p.x-xMin] = v
 	}
 	ret := ""
 	for i := range rect {
-		ret = ret + string(rect[i]) + "\n"
+		ret = ret + strings.Join(rect[i], "") + "\n"
 	}
 
 	return ret
@@ -88,15 +89,15 @@ func printHelper(p Point, node *tree.Tree) {
 	if node == nil {
 		return
 	}
-	points[p] = rune(node.Value + '0')
+	points[p] = strconv.Itoa(node.Value)
 	if isLeaf(node) {
 		return
 	}
 	if node.Left == nil { // node.Right != nil
-		points[p.offset(1, 1)] = '\\'
+		points[p.offset(1, 1)] = "\\"
 		printHelper(p.offset(2, 2), node.Right)
 	} else if node.Right == nil { // node.Left != nil
-		points[p.offset(-2, 2)] = '/'
+		points[p.offset(-1, 1)] = "/"
 		printHelper(p.offset(-2, 2), node.Left)
 	} else { // both sides exist
 		lines := max(1, maxRight(node.Left)+maxLeft(node.Right)-2)
@@ -108,13 +109,13 @@ func printHelper(p Point, node *tree.Tree) {
 
 func addLines(p Point, count int) {
 	for i := 1; i <= count; i++ {
-		points[p.offset(-i, i)] = '/'
-		points[p.offset(i, i)] = '\\'
+		points[p.offset(-i, i)] = "/"
+		points[p.offset(i, i)] = "\\"
 	}
 }
 
 func main() {
-	root := tree.New(3)
+	root := tree.New(1)
 
 	fmt.Println(fmtTree(root))
 }
