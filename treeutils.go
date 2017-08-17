@@ -16,13 +16,13 @@ func (p point) offset(x int, y int) point {
 
 // Helper functions
 
-// Returns digits of an integer written in decimal
+// intDigits returns digits of an integer written in decimal
 func intDigits(a int) (digits int) {
 	digits = len([]rune(strconv.Itoa(a)))
 	return
 }
 
-// Max of two integers
+// max returns of two integers
 func max(a, b int) int {
 	if a > b {
 		return a
@@ -30,7 +30,7 @@ func max(a, b int) int {
 	return b
 }
 
-// Min of two integers
+// min returns min of two integers
 func min(a, b int) int {
 	if a < b {
 		return a
@@ -38,7 +38,7 @@ func min(a, b int) int {
 	return b
 }
 
-// Returns the max value of a tree
+// treeMaxValue returns the max value of a tree
 func treeMaxValue(root *tree.Tree) int {
 	if root == nil {
 		return -1001
@@ -52,14 +52,14 @@ func treeMaxValue(root *tree.Tree) int {
 	return ret
 }
 
-// Returns true if root.Left == root.Right == nil. False otherwise
+// isLeaf returns true if root.Left == root.Right == nil. False otherwise
 func isLeaf(root *tree.Tree) (ret bool) {
 	return root.Left == nil && root.Right == nil
 }
 
 // Main functions
 
-// Returns how "left" the leftmost node in Tree root is.
+// maxLeft returns how "left" the leftmost node in Tree root is.
 // Meaning, how many units to the left of the root node
 // is the leftmost node in a graphical representation
 // of the tree located.
@@ -84,7 +84,7 @@ func maxLeft(root *tree.Tree) int {
 	return ret
 }
 
-// Returns max right offset. See maxLeft.
+// maxRight returns max right offset. See maxLeft.
 func maxRight(root *tree.Tree) (ret int) {
 	if root == nil {
 		return 0
@@ -102,7 +102,7 @@ func maxRight(root *tree.Tree) (ret int) {
 // to be converted into a string
 var points map[point]rune
 
-// Returns a multi-line string representation of the tree
+// PrettyTree returns a multi-line string representation of the tree
 func PrettyTree(root *tree.Tree) string {
 	points = make(map[point]rune) // Clear points map
 
@@ -140,7 +140,7 @@ func PrettyTree(root *tree.Tree) string {
 	return ret
 }
 
-// Adds necessary runes at correct points to represent string
+// addString adds necessary runes at correct points to represent string
 func addString(p point, value string) {
 	offset := (len(value) - 1) / 2
 	for index, char := range value {
@@ -148,6 +148,7 @@ func addString(p point, value string) {
 	}
 }
 
+// addLines adds `count` left and right lines starting at point `p`
 func addLines(p point, count int) {
 	for i := 1; i <= count; i++ {
 		points[p.offset(-i, i)] = '/'
@@ -155,8 +156,8 @@ func addLines(p point, count int) {
 	}
 }
 
-// Main helper function. Recursively adds tree node points at the correct
-// positions, as well as lines connecting them
+// addTreePoints is the main helper function. Recursively adds tree node points
+// at the correct positions, as well as lines connecting them
 func addTreePoints(p point, node *tree.Tree) {
 	if node == nil {
 		return
