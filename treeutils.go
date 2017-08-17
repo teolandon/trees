@@ -4,20 +4,25 @@ import "fmt"
 import "golang.org/x/tour/tree"
 import "strconv"
 
-type Point struct {
+// Simple point type, with offset operation
+type point struct {
 	x int
 	y int
 }
 
-func (p Point) offset(x int, y int) Point {
-	return Point{p.x + x, p.y + y}
+func (p point) offset(x int, y int) point {
+	return point{p.x + x, p.y + y}
 }
 
-func digitsOfInt(a int) (digits int) {
+// Helper functions
+
+// Returns digits of an integer written in decimal
+func intDigits(a int) (digits int) {
 	digits = len([]rune(strconv.Itoa(a)))
 	return
 }
 
+// Max of two integers
 func max(a, b int) int {
 	if a > b {
 		return a
@@ -25,6 +30,7 @@ func max(a, b int) int {
 	return b
 }
 
+// Min of two integers
 func min(a, b int) int {
 	if a < b {
 		return a
@@ -32,6 +38,7 @@ func min(a, b int) int {
 	return b
 }
 
+// Returns the max value of a tree
 func treeMaxValue(root *tree.Tree) int {
 	if root == nil {
 		return -1001
@@ -45,10 +52,27 @@ func treeMaxValue(root *tree.Tree) int {
 	return ret
 }
 
+// Returns true if root.Left == root.Right == nil. False otherwise
 func isLeaf(root *tree.Tree) (ret bool) {
 	return root.Left == nil && root.Right == nil
 }
 
+// Main functions
+
+// Returns how "left" the leftmost node in Tree root is.
+// Meaning, how many units to the left of the root node
+// is the leftmost node in a graphical representation
+// of the tree located.
+//
+// More formally, it returns the maximum "left offset" value
+// of all the nodes in the tree, where "left offset" is defined
+// as the amount of left movements minus the amount of right movements
+// that are required to reach a node, starting from the root node.
+// The root node is counted as a movement in itself, so a leaf will
+// return 1, not 0.
+//
+// I'm actually pretty bad at explaining this, but it's not exported
+// anyway, so I'll leave it for later.
 func maxLeft(root *tree.Tree) int {
 	if root == nil {
 		return 0
@@ -60,6 +84,7 @@ func maxLeft(root *tree.Tree) int {
 	return ret
 }
 
+// Returns max right offset. See maxLeft.
 func maxRight(root *tree.Tree) (ret int) {
 	if root == nil {
 		return 0
@@ -72,10 +97,16 @@ func maxRight(root *tree.Tree) (ret int) {
 	return
 }
 
-var points = make(map[Point]rune)
+// Map containing runes at specific points.
+// More flexible than a 2D array or 2D slices,
+// to be converted into a string
+var points map[point]rune
 
-func fmtTree(root *tree.Tree) string {
-	printHelper(Point{0, 0}, root)
+// Returns a multi-line string representation of the tree
+func PrettyTree(root *tree.Tree) string {
+	points = make(map[point]rune) // Clear points map
+
+	addTreePoints(point{0, 0}, root) // Add points
 	xMin := 0
 	xMax := 0
 	yMax := 0
@@ -109,19 +140,29 @@ func fmtTree(root *tree.Tree) string {
 	return ret
 }
 
-func addPoint(p Point, value string) {
+// Adds necessary runes at correct points to represent string
+func addString(p point, value string) {
 	offset := (len(value) - 1) / 2
 	for index, char := range value {
 		points[p.offset(-offset+index, 0)] = char
 	}
 }
 
-func printHelper(p Point, node *tree.Tree) {
+func addLines(p point, count int) {
+	for i := 1; i <= count; i++ {
+		points[p.offset(-i, i)] = '/'
+		points[p.offset(i, i)] = '\\'
+	}
+}
+
+// Main helper function. Recursively adds tree node points at the correct
+// positions, as well as lines connecting them
+func addTreePoints(p point, node *tree.Tree) {
 	if node == nil {
 		return
 	}
 
-	addPoint(p, strconv.Itoa(node.Value))
+	addString(p, strconv.Itoa(node.Value))
 
 	if isLeaf(node) {
 		return
@@ -129,31 +170,23 @@ func printHelper(p Point, node *tree.Tree) {
 
 	if node.Left == nil { // node.Right != nil
 		points[p.offset(1, 1)] = '\\'
-		printHelper(p.offset(2, 2), node.Right)
+		addTreePoints(p.offset(2, 2), node.Right)
 	} else if node.Right == nil { // node.Left != nil
 		points[p.offset(-1, 1)] = '/'
-		printHelper(p.offset(-2, 2), node.Left)
+		addTreePoints(p.offset(-2, 2), node.Left)
 	} else { // both sides exist
 		lines := max(1, maxRight(node.Left)+maxLeft(node.Right)-2)
-		k := digitsOfInt(treeMaxValue(node))
+		k := intDigits(treeMaxValue(node))
 		fmt.Println("Value of k*lines:", k*lines)
 		offset := k * lines
 		addLines(p, offset)
-		printHelper(p.offset(-offset-1, offset+1), node.Left)
-		printHelper(p.offset(offset+1, offset+1), node.Right)
-	}
-}
-
-func addLines(p Point, count int) {
-	for i := 1; i <= count; i++ {
-		points[p.offset(-i, i)] = '/'
-		points[p.offset(i, i)] = '\\'
+		addTreePoints(p.offset(-offset-1, offset+1), node.Left)
+		addTreePoints(p.offset(offset+1, offset+1), node.Right)
 	}
 }
 
 func main() {
 	root := tree.New(100)
 
-	fmt.Println(fmtTree(root))
-	fmt.Println(treeMaxValue(root))
+	fmt.Println(PrettyTree(root))
 }
