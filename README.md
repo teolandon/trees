@@ -1,6 +1,6 @@
 # trees
 
-A Go package that supplies the [binary search tree data](https://en.wikipedia.org/wiki/Binary_search_tree) structure.
+A Go package that supplies the [binary search tree](https://en.wikipedia.org/wiki/Binary_search_tree) data structure.
 
 # Usage
 
