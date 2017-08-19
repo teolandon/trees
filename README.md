@@ -1,6 +1,6 @@
-# treeutils
+# trees
 
-A Go package to print trees in a readable way.
+A Go package that supplies the [binary search tree data](https://en.wikipedia.org/wiki/Binary_search_tree) structure.
 
 # Usage
 
