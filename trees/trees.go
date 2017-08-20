@@ -1,11 +1,12 @@
 package trees
 
-import "fmt"
+import "github.com/teolandon/trees/comparator"
 
 type Tree struct {
-	Left  *Tree
-	Value fmt.Stringer
-	Right *Tree
+	Left       *Tree
+	Value      interface{}
+	Right      *Tree
+	comparator comparator.Comparator
 }
 
 // IsLeaf returns true if root.Left == root.Right == nil. False otherwise
